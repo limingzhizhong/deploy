@@ -97,10 +97,11 @@ def CalcMD5(filename):
 
 
 if "__main__" == __name__:
-    loadfile = '/Users/admin/Documents/deploy/deploy.yaml'
+    loadfile = '../deploy.yml'
     data = read_file(loadfile)
     user = input('请输入服务器名字: ')
     passwd = getpass.getpass()
+    print(data)
     print(user)
     print(passwd)
     put_files()

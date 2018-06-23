@@ -41,13 +41,13 @@ class MySSH(object):
             # print(stdout.readlines())
             # print(u'连接SSH %s 成功...' % self.host)
         except Exception as e:
-            print('ssh %s@%s: %s' % (self.username, self.host, e))
+            print('ssh %s@%s:%s: %s' % (self.username, self.host, self.port, e))
             # exit()
 
+
+
     def sftp_put(self, from_path, to_path) -> object:
-        """
-        :rtype: object
-        """
+
         try:
             # print("开始sftp连接远程主机%s" % self.host)
             self.t = paramiko.Transport(self.host, self.port)
@@ -61,6 +61,7 @@ class MySSH(object):
             print('sftp %s@%s: %s' % (self.username, self.host, e))
 
             # exit()
+
 
     def exe(self, cmd):
         '''''
