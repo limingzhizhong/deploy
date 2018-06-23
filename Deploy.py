@@ -38,7 +38,8 @@ def put_files():
         for index in range(len(b.hosts)):
             host = b.hosts[index].split(':')[0]
             port = int(b.hosts[index].split(':')[1])
-            ssh = SFTP.MySSH(host, port, user, passwd)
+            print(port)
+            ssh = SFTP.MySSH(host=host, username=user, password=passwd)
             for keys in b.updateFile.keys():
                 if b.type == 'hz':
                     from_path = b.localPath + b.updateFile.get(keys)
