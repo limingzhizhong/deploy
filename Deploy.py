@@ -38,7 +38,6 @@ def put_files():
         for index in range(len(b.hosts)):
             host = b.hosts[index].split(':')[0]
             port = int(b.hosts[index].split(':')[1])
-            print(port)
             ssh = SFTP.MySSH(host=host, port=port, username=user, password=passwd)
             for keys in b.updateFile.keys():
                 if b.type == 'hz':
@@ -52,9 +51,11 @@ def put_files():
                         from_md5 = CalcMD5(from_path)
                         # print(to_md5 == from_md5)
                         if to_md5 == from_md5:
-                            print("主机%s拷贝成功：%s " % (host, b.updateFile.get(keys)))
+                            continue
+                            #print("主机%s拷贝成功：%s " % (host, b.updateFile.get(keys)))
                         else:
                             print("主机%s上传文件%smd5不正确！！！！" % (host, b.updateFile.get(keys)))
+
                 else:
                     if keys != 'extensions':
                         for i in range(len(b.remotePath)):
@@ -67,7 +68,8 @@ def put_files():
                             from_md5 = CalcMD5(from_path)
                             # print(to_md5 == from_md5)
                             if to_md5 == from_md5:
-                                print("主机%s拷贝成功：%s " % (host, b.updateFile.get(keys)))
+                                continue
+                                #print("主机%s拷贝成功：%s " % (host, b.updateFile.get(keys)))
                             else:
                                 print("主机%s上传文件%smd5不正确！！！！" % (host, b.updateFile.get(keys)))
                     else:
@@ -80,7 +82,8 @@ def put_files():
                             to_md5 = ssh.exe(cmd).strip()
                             from_md5 = CalcMD5(from_path)
                             if to_md5 == from_md5:
-                                print("主机%s拷贝成功：%s " % (host, b.updateFile.get(keys)))
+                                continue
+                                #print("主机%s拷贝成功：%s " % (host, b.updateFile.get(keys)))
                             else:
                                 print("主机%s上传文件%smd5不正确！！！！" % (host, b.updateFile.get(keys)))
 
