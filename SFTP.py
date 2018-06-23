@@ -10,7 +10,7 @@ class MySSH(object):
     5、关闭链接
     """
 
-    def __init__(self, host, port=22, username='', password=''):
+    def __init__(self, host, port=9300, username='', password=''):
 
         """
         :rtype: object

@@ -4,8 +4,8 @@ import getpass
 import hashlib
 
 
-def read_file():
-    with open('/Users/admin/Documents/deploy/Deploy2.yml', 'r') as f:
+def read_file(loadfile):
+    with open(loadfile, 'r') as f:
         return yaml.load(f)
 
 
@@ -26,9 +26,7 @@ class Param(object):
 
     def __get_host(self):
         self.type = self.values.get('type')
-        a = self.values.get('ip')
-        self.hosts = a.split(':')[0]
-        self.port = int(a.split(':')[1])
+        self.hosts = self.values.get('ip')
         self.remotePath = self.values.get('remotePath')
         self.updateFile = self.values.get('updateFile')
         self.localPath = self.values.get('localPath')
@@ -37,47 +35,50 @@ class Param(object):
 def put_files():
     for KEY in data.keys():
         b = Param(data.get(KEY))
-        ssh = SFTP.MySSH(b.hosts, b.port, user, passwd)
-        for keys in b.updateFile.keys():
-            if b.type == 'hz':
-                from_path = b.localPath + b.updateFile.get(keys)
-                to_path = b.remotePath + 'lib/' + b.updateFile.get(keys)
-                print("正在拷贝 %s" % b.type)
-                ssh.sftp_put(from_path, to_path)
-                cmd = "md5sum %s|cut -d ' ' -f1" % (to_path)
-                to_md5 = ssh.exe(cmd).strip()
-                from_md5 = CalcMD5(from_path)
-                # print(to_md5 == from_md5)
-                if to_md5 == from_md5:
-                    print("拷贝成功：%s " % b.updateFile.get(keys))
-                else:
-                    print("md5不正确：%s ,重新上传" % b.updateFile.get(keys))
-            else:
-                if keys == 'basic':
+        for index in range(len(b.hosts)):
+            host = b.hosts[index].split(':')[0]
+            port = int(b.hosts[index].split(':')[1])
+            ssh = SFTP.MySSH(host, port, user, passwd)
+            for keys in b.updateFile.keys():
+                if b.type == 'hz':
                     from_path = b.localPath + b.updateFile.get(keys)
-                    to_path = b.remotePath + 'extensions/__lib__/' + b.updateFile.get(keys)
+                    to_path = b.remotePath + 'lib/' + b.updateFile.get(keys)
                     print("正在拷贝 %s" % b.type)
                     ssh.sftp_put(from_path, to_path)
-                    cmd = "md5sum %s|cut -d ' ' -f1" % (to_path)
+                    cmd = "md5sum %s|cut -d ' ' -f1" % to_path
                     to_md5 = ssh.exe(cmd).strip()
                     from_md5 = CalcMD5(from_path)
                     # print(to_md5 == from_md5)
                     if to_md5 == from_md5:
-                        print("拷贝成功：%s " % b.updateFile.get(keys))
+                        print("主机%s拷贝成功：%s " % (host, b.updateFile.get(keys)))
                     else:
-                        print("md5不正确：%s ,重新上传" % b.updateFile.get(keys))
+                        print("主机%s上传文件%smd5不正确！！！！" % (host, b.updateFile.get(keys)))
                 else:
-                    from_path = b.localPath + b.updateFile.get(keys)
-                    to_path = b.remotePath + 'extensions/' + b.type + '/' + b.updateFile.get(keys)
-                    print("正在拷贝 %s" % b.updateFile.get(keys))
-                    ssh.sftp_put(from_path, to_path)
-                    cmd = "md5sum %s|cut -d ' ' -f1" % (to_path)
-                    to_md5 = ssh.exe(cmd).strip()
-                    from_md5 = CalcMD5(from_path)
-                    if to_md5 == from_md5:
-                        print("主机%s拷贝成功：%s " % (b.hosts, b.updateFile.get(keys)))
+                    if keys == 'basic':
+                        from_path = b.localPath + b.updateFile.get(keys)
+                        to_path = b.remotePath + 'extensions/__lib__/' + b.updateFile.get(keys)
+                        print("正在拷贝 %s" % b.type)
+                        ssh.sftp_put(from_path, to_path)
+                        cmd = "md5sum %s|cut -d ' ' -f1" % to_path
+                        to_md5 = ssh.exe(cmd).strip()
+                        from_md5 = CalcMD5(from_path)
+                        # print(to_md5 == from_md5)
+                        if to_md5 == from_md5:
+                            print("主机%s拷贝成功：%s " % (host, b.updateFile.get(keys)))
+                        else:
+                            print("主机%s上传文件%smd5不正确！！！！" % (host, b.updateFile.get(keys)))
                     else:
-                        print("主机%s上传文件%smd5不正确！！！！" % (b.hosts, b.updateFile.get(keys)))
+                        from_path = b.localPath + b.updateFile.get(keys)
+                        to_path = b.remotePath + 'extensions/' + b.type + '/' + b.updateFile.get(keys)
+                        print("正在拷贝 %s" % b.updateFile.get(keys))
+                        ssh.sftp_put(from_path, to_path)
+                        cmd = "md5sum %s|cut -d ' ' -f1" % to_path
+                        to_md5 = ssh.exe(cmd).strip()
+                        from_md5 = CalcMD5(from_path)
+                        if to_md5 == from_md5:
+                            print("主机%s拷贝成功：%s " % (host, b.updateFile.get(keys)))
+                        else:
+                            print("主机%s上传文件%smd5不正确！！！！" % (host, b.updateFile.get(keys)))
 
 
 def CalcMD5(filename):
@@ -95,7 +96,8 @@ def CalcMD5(filename):
 
 
 if "__main__" == __name__:
-    data = read_file()
+    loadfile = '/Users/admin/Documents/deploy/deploy.yaml'
+    data = read_file(loadfile)
     user = input('请输入服务器名字: ')
     passwd = getpass.getpass()
     print(user)
