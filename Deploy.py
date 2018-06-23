@@ -38,8 +38,8 @@ def put_files():
         for index in range(len(b.hosts)):
             host = b.hosts[index].split(':')[0]
             port = int(b.hosts[index].split(':')[1])
-            print(port)
-            ssh = SFTP.MySSH(host=host, username=user, password=passwd)
+            #print(port)
+            ssh = SFTP.MySSH(host=host, port=port, username=user, password=passwd)
             for keys in b.updateFile.keys():
                 if b.type == 'hz':
                     from_path = b.localPath + b.updateFile.get(keys)
@@ -97,11 +97,10 @@ def CalcMD5(filename):
 
 
 if "__main__" == __name__:
-    loadfile = '../deploy.yml'
+    loadfile = '/Users/admin/Documents/deploy/deploy.yaml'
     data = read_file(loadfile)
     user = input('请输入服务器名字: ')
     passwd = getpass.getpass()
-    print(data)
     print(user)
     print(passwd)
     put_files()
