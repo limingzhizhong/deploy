@@ -56,10 +56,10 @@ def put_files():
                         else:
                             print("主机%s上传文件%smd5不正确！！！！" % (host, b.updateFile.get(keys)))
                 else:
-                    if keys == 'basic':
+                    if keys != 'extensions':
                         for i in range(len(b.remotePath)):
                             from_path = b.localPath + b.updateFile.get(keys)
-                            to_path = b.remotePath[i] + 'extensions/__lib__/' + b.updateFile.get(keys)
+                            to_path = b.remotePath[i] + 'extensions/' + b.type + '/' + b.updateFile.get(keys)
                             print("正在拷贝 %s" % b.type)
                             ssh.sftp_put(from_path, to_path)
                             cmd = "md5sum %s|cut -d ' ' -f1" % to_path
@@ -73,7 +73,7 @@ def put_files():
                     else:
                         for i in range(len(b.remotePath)):
                             from_path = b.localPath + b.updateFile.get(keys)
-                            to_path = b.remotePath[i] + 'extensions/' + b.type + '/' + b.updateFile.get(keys)
+                            to_path = b.remotePath[i] + 'extensions/__lib__/' + b.updateFile.get(keys)
                             print("正在拷贝 %s" % b.updateFile.get(keys))
                             ssh.sftp_put(from_path, to_path)
                             cmd = "md5sum %s|cut -d ' ' -f1" % to_path
@@ -104,6 +104,6 @@ if "__main__" == __name__:
     data = read_file(loadfile)
     user = input('请输入服务器名字: ')
     passwd = getpass.getpass()
-    print(user)
-    print(passwd)
+    #print(user)
+    #print(passwd)
     put_files()
