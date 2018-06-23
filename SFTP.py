@@ -50,7 +50,7 @@ class MySSH(object):
 
         try:
             # print("开始sftp连接远程主机%s" % self.host)
-            self.t = paramiko.Transport(self.host, self.port)
+            self.t = paramiko.Transport((self.host, self.port))
             self.t.connect(username=self.username, password=self.password)
             self.sftp = paramiko.SFTPClient.from_transport(self.t)
             self.sftp.put(from_path, to_path)
