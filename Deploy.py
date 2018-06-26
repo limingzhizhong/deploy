@@ -21,8 +21,8 @@ class Param(object):
         self.port = None
         self.values = values
         self.__get_host()
-        self.basic = 'basic-core-1.0-SNAPSHOT.jar'
-        self.services = 'services-1.0-SNAPSHOT.jar'
+        self.basic = None
+        self.services = None
 
     def __get_host(self):
         self.type = self.values.get('type')
