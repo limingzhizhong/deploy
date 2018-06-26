@@ -37,7 +37,7 @@ class MySSH(object):
             self.ssh = paramiko.SSHClient()
             self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             self.ssh.connect(self.host, self.port, username=self.username, password=self.password)
-            #stdin, stdout, stderr = self.ssh.exec_command('uname -a')
+            stdin, stdout, stderr = self.ssh.exec_command('rm -f /home/GameServer*/logs/*')
             # print(stdout.readlines())
             # print(u'连接SSH %s 成功...' % self.host)
         except Exception as e:

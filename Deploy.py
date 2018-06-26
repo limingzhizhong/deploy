@@ -44,7 +44,7 @@ def put_files():
                     for i in range(len(b.remotePath)):
                         from_path = b.localPath + b.updateFile.get(keys)
                         to_path = b.remotePath[i] + 'lib/' + b.updateFile.get(keys)
-                        print("正在拷贝 %s" % b.type)
+                        #print("正在拷贝 %s" % b.type)
                         ssh.sftp_put(from_path, to_path)
                         cmd = "md5sum %s|cut -d ' ' -f1" % to_path
                         to_md5 = ssh.exe(cmd).strip()
@@ -61,7 +61,7 @@ def put_files():
                         for i in range(len(b.remotePath)):
                             from_path = b.localPath + b.updateFile.get(keys)
                             to_path = b.remotePath[i] + 'extensions/' + b.type + '/' + b.updateFile.get(keys)
-                            print("正在拷贝 %s" % b.type)
+                            #print("正在拷贝 %s" % b.type)
                             ssh.sftp_put(from_path, to_path)
                             cmd = "md5sum %s|cut -d ' ' -f1" % to_path
                             to_md5 = ssh.exe(cmd).strip()
@@ -76,7 +76,7 @@ def put_files():
                         for i in range(len(b.remotePath)):
                             from_path = b.localPath + b.updateFile.get(keys)
                             to_path = b.remotePath[i] + 'extensions/__lib__/' + b.updateFile.get(keys)
-                            print("正在拷贝 %s" % b.updateFile.get(keys))
+                            #print("正在拷贝 %s" % b.updateFile.get(keys))
                             ssh.sftp_put(from_path, to_path)
                             cmd = "md5sum %s|cut -d ' ' -f1" % to_path
                             to_md5 = ssh.exe(cmd).strip()
