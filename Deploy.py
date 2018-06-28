@@ -5,9 +5,9 @@ import hashlib
 import datetime
 
 
-def read_file(loadfile):
+def read_file(file):
     try:
-        with open(loadfile, 'r') as f:
+        with open(file, 'r') as f:
             return yaml.load(f)
     except Exception as e:
         print("", e)
@@ -16,11 +16,11 @@ def read_file(loadfile):
 
 class Param(object):
 
-    def __init__(self, values, username, password):
+    def __init__(self, values, user, passwd):
         """
         :param values:
-        :param username:
-        :param password:
+        :param user:
+        :param passwd:
         hosts: 主机列别
         localPath: 本地文件路径
         remotePath: 需要更新的服务器文件路径
@@ -28,8 +28,9 @@ class Param(object):
         serverType: 游戏服务器类型
         type: 需要更新的类型
         """
-        self.username = username
-        self.password = password
+        self.host = None
+        self.username = user
+        self.password = passwd
         self.hosts = None
         self.localPath = None
         self.updateFile = None
@@ -46,6 +47,7 @@ class Param(object):
         self.ssh = None
         self.update_hz()
         self.update_game()
+        self.update_web()
 
     def __get_host(self):
         self.type = self.values.get('type')
@@ -82,6 +84,7 @@ class Param(object):
                                                             self.updateFile.get(self.keys)))
             else:
                 continue
+
     def update_game(self):
         """
         升级游戏
@@ -109,7 +112,34 @@ class Param(object):
                             print("主机%s上传文件%smd5不正确！！！！" % (self.hosts[self.index].split(':')[0],
                                                             self.updateFile.get(self.keys)))
             else:
-                continue
+                if self.keys != 'yml':
+                    for self.i in range(len(b.remotePath)):
+                        self.from_path = self.localPath + self.updateFile.get(self.keys)
+                        self.to_path = self.remotePath[self.i] + 'extensions/__lib__/' + self.updateFile.get(self.keys)
+                        # print("正在拷贝 %s" % b.updateFile.get(keys))
+                        self.ssh.sftp_put(self.from_path, self.to_path)
+                        self.cmd = "md5sum %s|cut -d ' ' -f1" % self.to_path
+                        self.to_md5 = self.ssh.exe(self.cmd).strip()
+                        self.from_md5 = self.__CallMD5(self.from_path)
+                        if self.to_md5 == self.from_md5:
+                            continue
+                            # print("主机%s拷贝成功：%s " % (host, b.updateFile.get(keys)))
+                        else:
+                            print("主机%s上传文件%smd5不正确！！！！" % (self.host, b.updateFile.get(self.keys)))
+                else:
+                    for i in range(len(b.remotePath)):
+                        self.from_path = self.localPath + self.updateFile.get(self.keys)
+                        self.to_path = self.remotePath[i] + self.updateFile.get(self.keys)
+                        # print("正在拷贝 %s" % b.updateFile.get(keys))
+                        self.ssh.sftp_put(self.from_path, self.to_path)
+                        self.cmd = "md5sum %s|cut -d ' ' -f1" % self.to_path
+                        self.to_md5 = self.ssh.exe(self.cmd).strip()
+                        self.from_md5 = self.__CallMD5(self.from_path)
+                        if self.to_md5 == self.from_md5:
+                            continue
+                            # print("主机%s拷贝成功：%s " % (host, b.updateFile.get(keys)))
+                        else:
+                            print("主机%s上传文件%smd5不正确！！！！" % (self.host, self.updateFile.get(self.keys)))
 
     def update_web(self):
         """
@@ -123,17 +153,30 @@ class Param(object):
                     username=self.username,
                     password=self.password
                 )
-                self.cmd = "zip -r %s %s" % (datetime.date.today(), self.to_path.split('.')[0])
-                self.ssh.sftp_put(self.from_path, self.to_path)
-                self.to_md5 = self.ssh.exe(self.cmd).strip()
-                self.from_md5 = self.__CallMD5(self.from_path)
-                if self.to_md5 == self.from_md5:
-                    continue
-                else:
-                    print("主机%s上传文件%smd5不正确！！！！" % (self.hosts[self.index].split(':')[0],
-                                                    self.updateFile.get(self.keys)))
-                self.cmd = "unzip %s" % self.to_path
-                self.ssh.exe(self.cmd)
+                for self.keys in self.updateFile.keys():
+                    if self.keys != 'zip':
+                        continue
+                    else:
+                        for self.i in range(len(self.remotePath)):
+                            self.cmd = "zip -r %s %s" % (
+                                self.remotePath[self.i] + datetime.date.today().strftime('%Y-%m-%d') + '.zip',
+                                self.remotePath[self.i] + self.serverType + '/')
+                            print("这是压缩命令%s" % self.cmd)
+                            self.ssh.exe(self.cmd)
+                            self.from_path = self.localPath + self.updateFile.get(self.keys)
+                            self.to_path = self.remotePath[self.i] + self.updateFile.get(self.keys)
+                            self.ssh.sftp_put(self.from_path, self.to_path)
+                            self.cmd = "md5sum %s|cut -d ' ' -f1" % self.to_path
+                            self.to_md5 = self.ssh.exe(self.cmd)[0].strip()
+                            print("远程md5=%s" % self.to_md5)
+                            self.from_md5 = self.__CallMD5(self.from_path)
+                            print(self.from_md5)
+                            if self.to_md5 == self.from_md5:
+                                self.cmd = "unzip -qo %s -d %s" % (self.to_path, self.remotePath[self.i])
+                                self.ssh.exe(self.cmd)
+                            else:
+                                print("主机%s上传文件%smd5不正确！！！！" % (self.hosts[self.index].split(':')[0],
+                                                                self.updateFile.get(self.keys)))
 
     def update_brnn(self):
         """
@@ -153,8 +196,8 @@ class Param(object):
             with open(filename, 'rb') as f:
                 md5obj = hashlib.md5()
                 md5obj.update(f.read())
-                hash = md5obj.hexdigest()
-                return hash
+                hashes = md5obj.hexdigest()
+                return hashes
         except Exception as e:
             print("本地文件不存在 %s" % e)
 
@@ -165,4 +208,4 @@ if "__main__" == __name__:
     username = input("请输入用户名:")
     password = getpass.getpass()
     for KEY in data.keys():
-        b = Param(data.get(KEY), username=username, password=password)
+        b = Param(data.get(KEY), user=username, passwd=password)

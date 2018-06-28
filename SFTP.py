@@ -1,4 +1,8 @@
 import paramiko
+import sys
+
+
+
 
 
 class MySSH(object):
@@ -30,15 +34,20 @@ class MySSH(object):
 
         self.ssh_connect()
 
+    @staticmethod
+    def __callback(a, b):
+        sys.stdout.write('Data Transmission %10d [%3.2f%%]\r' % (a, a * 100. / int(b)))
+        sys.stdout.flush()
+
     def ssh_connect(self):
         try:
             # print("开始ssh连接远程主机%s" % self.host)
             self.ssh = paramiko.SSHClient()
             self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             self.ssh.connect(self.host, self.port, username=self.username, password=self.password)
-            stdin, stdout, stderr = self.ssh.exec_command('rm -f /home/GameServer*/logs/*')
-            #print(stdout.readlines())
-            #print(u'连接SSH %s 成功...' % self.host)
+            stdin, stdout, stderr = self.ssh.exec_command('date')
+            print(stdout.readline())
+            print(u'连接SSH %s 成功...' % self.host)
         except Exception as e:
             print('ssh %s@%s:%s: %s' % (self.username, self.host, self.port, e))
             # exit()
@@ -50,7 +59,7 @@ class MySSH(object):
             self.t = paramiko.Transport((self.host, self.port))
             self.t.connect(username=self.username, password=self.password)
             self.sftp = paramiko.SFTPClient.from_transport(self.t)
-            self.sftp.put(from_path, to_path)
+            self.sftp.put(from_path, to_path, callback=self.__callback(10, 10))
             self.t.close()
             print("%s 上传成功" % self.host)
 
@@ -77,9 +86,9 @@ class MySSH(object):
         '''''
             让远程服务器执行cmd
         '''
-        stdin, stdout, stderr = self.ssh.exec_command(cmd)
-        if cmd.find('md5') == 0:
-            return stdout.readline()
+        stdin, stdout, stderr = self.ssh.exec_command(cmd, get_pty=True)
+        #if cmd.find('md5') == 0:
+        return stdout.readline()
 
     def close(self):
         self.ssh.close()
