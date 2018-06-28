@@ -2,6 +2,7 @@ import yaml
 import SFTP
 import getpass
 import hashlib
+import datetime
 
 
 def read_file(loadfile):
@@ -16,6 +17,17 @@ def read_file(loadfile):
 class Param(object):
 
     def __init__(self, values, username, password):
+        """
+        :param values:
+        :param username:
+        :param password:
+        hosts: 主机列别
+        localPath: 本地文件路径
+        remotePath: 需要更新的服务器文件路径
+        updateFile: 需要更新的文件
+        serverType: 游戏服务器类型
+        type: 需要更新的类型
+        """
         self.username = username
         self.password = password
         self.hosts = None
@@ -32,6 +44,8 @@ class Param(object):
         self.to_md5 = None
         self.from_md5 = None
         self.ssh = None
+        self.update_hz()
+        self.update_game()
 
     def __get_host(self):
         self.type = self.values.get('type')
@@ -42,15 +56,18 @@ class Param(object):
         self.serverType = self.values.get('serverType')
 
     def update_hz(self):
-            for self.keys in self.updateFile.keys():
-                if self.type == 'hz':
-                    for self.index in range(len(self.hosts)):
-                        self.ssh = SFTP.MySSH(
-                            host=self.hosts[self.index].split(':')[0],
-                            port=self.hosts[self.index].split(':')[1],
-                            username=self.username,
-                            password=self.password
-                        )
+        """
+        升级hz
+        """
+        for self.keys in self.updateFile.keys():
+            if self.type == 'hz':
+                for self.index in range(len(self.hosts)):
+                    self.ssh = SFTP.MySSH(
+                        host=self.hosts[self.index].split(':')[0],
+                        port=self.hosts[self.index].split(':')[1],
+                        username=self.username,
+                        password=self.password
+                    )
                     for self.i in range(len(self.remotePath)):
                         self.from_path = self.localPath + self.updateFile.get(self.keys)
                         self.to_path = self.remotePath[self.i] + 'lib/' + self.updateFile.get(self.keys)
@@ -63,22 +80,25 @@ class Param(object):
                         else:
                             print("主机%s上传文件%smd5不正确！！！！" % (self.hosts[self.index].split(':')[0],
                                                             self.updateFile.get(self.keys)))
-                else:
-                    continue
-
+            else:
+                continue
     def update_game(self):
-            for self.keys in self.updateFile.keys():
-                if self.type == 'game' and self.keys != 'extensions':
-                    for self.index in range(len(self.hosts)):
-                        self.ssh = SFTP.MySSH(
-                            host=self.hosts[self.index].split(':')[0],
-                            port=int(self.hosts[self.index].split(':')[1]),
-                            username=self.username,
-                            password=self.password
-                        )
+        """
+        升级游戏
+        """
+        for self.keys in self.updateFile.keys():
+            if self.type == 'game' and self.keys != 'extensions':
+                for self.index in range(len(self.hosts)):
+                    self.ssh = SFTP.MySSH(
+                        host=self.hosts[self.index].split(':')[0],
+                        port=int(self.hosts[self.index].split(':')[1]),
+                        username=self.username,
+                        password=self.password
+                    )
                     for self.i in range(len(self.remotePath)):
                         self.from_path = self.localPath + self.updateFile.get(self.keys)
-                        self.to_path = self.remotePath[self.i] + 'extensions/' + self.serverType + '/' + self.updateFile.get(self.keys)
+                        self.to_path = self.remotePath[self.i] + 'extensions/' + self.serverType + '/' + \
+                                       self.updateFile.get(self.keys)
                         self.ssh.sftp_put(self.from_path, self.to_path)
                         self.cmd = "md5sum %s|cut -d ' ' -f1" % self.to_path
                         self.to_md5 = self.ssh.exe(self.cmd).strip()
@@ -88,13 +108,37 @@ class Param(object):
                         else:
                             print("主机%s上传文件%smd5不正确！！！！" % (self.hosts[self.index].split(':')[0],
                                                             self.updateFile.get(self.keys)))
-                else:
-                    continue
+            else:
+                continue
 
     def update_web(self):
-        pass
+        """
+        升级web
+        """
+        if self.type == 'web':
+            for self.index in range(len(self.hosts)):
+                self.ssh = SFTP.MySSH(
+                    host=self.hosts[self.index].split(':')[0],
+                    port=int(self.hosts[self.index].split(':')[1]),
+                    username=self.username,
+                    password=self.password
+                )
+                self.cmd = "zip -r %s %s" % (datetime.date.today(), self.to_path.split('.')[0])
+                self.ssh.sftp_put(self.from_path, self.to_path)
+                self.to_md5 = self.ssh.exe(self.cmd).strip()
+                self.from_md5 = self.__CallMD5(self.from_path)
+                if self.to_md5 == self.from_md5:
+                    continue
+                else:
+                    print("主机%s上传文件%smd5不正确！！！！" % (self.hosts[self.index].split(':')[0],
+                                                    self.updateFile.get(self.keys)))
+                self.cmd = "unzip %s" % self.to_path
+                self.ssh.exe(self.cmd)
 
     def update_brnn(self):
+        """
+
+        """
         pass
 
     def update_worldcup(self):
@@ -122,5 +166,3 @@ if "__main__" == __name__:
     password = getpass.getpass()
     for KEY in data.keys():
         b = Param(data.get(KEY), username=username, password=password)
-        b.update_hz()
-        b.update_game()
