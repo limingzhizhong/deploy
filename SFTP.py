@@ -30,7 +30,6 @@ class MySSH(object):
 
         self.ssh_connect()
 
-
     def ssh_connect(self):
         try:
             # print("开始ssh连接远程主机%s" % self.host)
@@ -38,13 +37,11 @@ class MySSH(object):
             self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             self.ssh.connect(self.host, self.port, username=self.username, password=self.password)
             stdin, stdout, stderr = self.ssh.exec_command('rm -f /home/GameServer*/logs/*')
-            # print(stdout.readlines())
-            # print(u'连接SSH %s 成功...' % self.host)
+            #print(stdout.readlines())
+            #print(u'连接SSH %s 成功...' % self.host)
         except Exception as e:
             print('ssh %s@%s:%s: %s' % (self.username, self.host, self.port, e))
             # exit()
-
-
 
     def sftp_put(self, from_path, to_path) -> object:
 
@@ -55,13 +52,26 @@ class MySSH(object):
             self.sftp = paramiko.SFTPClient.from_transport(self.t)
             self.sftp.put(from_path, to_path)
             self.t.close()
-            #print("%s 上传成功" % self.host)
+            print("%s 上传成功" % self.host)
+
+        except Exception as e:
+            print('sftp %s@%s: %s' % (self.username, self.host, e))
+
+    def sftp_get(self, from_path, to_path) -> object:
+
+        try:
+            # print("开始sftp连接远程主机%s" % self.host)
+            self.t = paramiko.Transport((self.host, self.port))
+            self.t.connect(username=self.username, password=self.password)
+            self.sftp = paramiko.SFTPClient.from_transport(self.t)
+            self.sftp.get(to_path, from_path)
+            self.t.close()
+            # print("%s 上传成功" % self.host)
 
         except Exception as e:
             print('sftp %s@%s: %s' % (self.username, self.host, e))
 
             # exit()
-
 
     def exe(self, cmd):
         '''''
@@ -70,3 +80,9 @@ class MySSH(object):
         stdin, stdout, stderr = self.ssh.exec_command(cmd)
         if cmd.find('md5') == 0:
             return stdout.readline()
+
+    def close(self):
+        self.ssh.close()
+
+    def __del__(self):
+        self.close()
