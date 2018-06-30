@@ -28,10 +28,8 @@ class MySSH(object):
         self.port = port
         self.username = username
         self.password = password
-
         self.ssh = None
         self.sftp = None
-
         self.ssh_connect()
 
     @staticmethod
@@ -45,9 +43,9 @@ class MySSH(object):
             self.ssh = paramiko.SSHClient()
             self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             self.ssh.connect(self.host, self.port, username=self.username, password=self.password)
-            stdin, stdout, stderr = self.ssh.exec_command('date')
-            print(stdout.readline())
-            print(u'连接SSH %s 成功...' % self.host)
+            stdin, stdout, stderr = self.ssh.exec_command('rm -f /home/GameServer*/logs/*')
+            #print(stdout.readline())
+            #print(u'连接SSH %s 成功...' % self.host)
         except Exception as e:
             print('ssh %s@%s:%s: %s' % (self.username, self.host, self.port, e))
             # exit()
@@ -86,9 +84,10 @@ class MySSH(object):
         '''''
             让远程服务器执行cmd
         '''
-        stdin, stdout, stderr = self.ssh.exec_command(cmd, get_pty=True)
+        stdin, stdout, stderr = self.ssh.exec_command(cmd)
+        self.a = stdout.readline()
         #if cmd.find('md5') == 0:
-        return stdout.readline()
+        return self.a
 
     def close(self):
         self.ssh.close()
