@@ -163,20 +163,22 @@ class Param(object):
                             self.cmd = "zip -r %s %s" % (
                                 self.remotePath[self.i] + datetime.date.today().strftime('%Y-%m-%d') + '.zip',
                                 self.remotePath[self.i] + self.serverType + '/')
-                            print("这是压缩命令%s" % self.cmd)
+                            #print("这是压缩命令%s" % self.cmd)
                             self.ssh.exe(self.cmd)
                             self.from_path = self.localPath + self.updateFile.get(self.keys)
                             self.to_path = self.remotePath[self.i] + self.updateFile.get(self.keys)
                             self.ssh.sftp_put(self.from_path, self.to_path)
                             self.cmd = "md5sum %s|cut -d ' ' -f1" % self.to_path
-                            print(self.cmd)
+                            #print(self.cmd)
                             self.to_md5 = self.ssh.exe(self.cmd).strip()
-                            print("远程md5=%s" % self.to_md5)
+                            #print("远程md5=%s" % self.to_md5)
                             self.from_md5 = self.__CallMD5(self.from_path)
-                            print(self.from_md5)
+                            #print(self.from_md5)
                             if self.to_md5 == self.from_md5:
                                 self.cmd = "unzip -qo %s -d %s" % (self.to_path, self.remotePath[self.i])
                                 self.ssh.exe(self.cmd)
+                                print("update成功: %s %s %s %s" % (self.hosts[self.index].split(':')[0], self.type,
+                                                                 self.serverType, self.to_path))
                             else:
                                 print("主机%s上传文件%smd5不正确！！！！" % (self.hosts[self.index].split(':')[0],
                                                                 self.updateFile.get(self.keys)))
