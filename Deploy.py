@@ -75,14 +75,7 @@ class Param(object):
                             self.from_path = self.localPath + self.updateFile.get(self.keys)
                             self.to_path = self.remotePath[self.i] + 'lib/' + self.updateFile.get(self.keys)
                             self.ssh.sftp_put(self.from_path, self.to_path)
-                            self.cmd = "md5sum %s|cut -d ' ' -f1" % self.to_path
-                            self.to_md5 = self.ssh.exe(self.cmd)
-                            self.from_md5 = self.__CallMD5(self.from_path)
-                            if self.to_md5 == self.from_path:
-                                continue
-                            else:
-                                print("主机%s上传文件%smd5不正确！！！！" % (self.hosts[self.index].split(':')[0],
-                                                                self.updateFile.get(self.keys)))
+                            self.__checkMD5()
                 else:
                     continue
 
@@ -105,43 +98,21 @@ class Param(object):
                             self.to_path = self.remotePath[self.i] + 'extensions/' + self.serverType + '/' + \
                                            self.updateFile.get(self.keys)
                             self.ssh.sftp_put(self.from_path, self.to_path)
-                            self.cmd = "md5sum %s|cut -d ' ' -f1" % self.to_path
-                            self.to_md5 = self.ssh.exe(self.cmd).strip()
-                            self.from_md5 = self.__CallMD5(self.from_path)
-                            if self.to_md5 == self.from_md5:
-                                continue
-                            else:
-                                print("主机%s上传文件%smd5不正确！！！！" % (self.hosts[self.index].split(':')[0],
-                                                                self.updateFile.get(self.keys)))
+                            self.__checkMD5()
                 else:
                     if self.keys != 'yml':
                         for self.i in range(len(self.remotePath)):
                             self.from_path = self.localPath + self.updateFile.get(self.keys)
-                            self.to_path = self.remotePath[self.i] + 'extensions/__lib__/' + self.updateFile.get(self.keys)
-                            # print("正在拷贝 %s" % b.updateFile.get(keys))
+                            self.to_path = self.remotePath[self.i] + 'extensions/__lib__/' + self.updateFile.get(
+                                self.keys)
                             self.ssh.sftp_put(self.from_path, self.to_path)
-                            self.cmd = "md5sum %s|cut -d ' ' -f1" % self.to_path
-                            self.to_md5 = self.ssh.exe(self.cmd).strip()
-                            self.from_md5 = self.__CallMD5(self.from_path)
-                            if self.to_md5 == self.from_md5:
-                                continue
-                                # print("主机%s拷贝成功：%s " % (host, b.updateFile.get(keys)))
-                            else:
-                                print("主机%s上传文件%smd5不正确！！！！" % (self.host, b.updateFile.get(self.keys)))
+                            self.__checkMD5()
                     else:
                         for i in range(len(b.remotePath)):
                             self.from_path = self.localPath + self.updateFile.get(self.keys)
                             self.to_path = self.remotePath[i] + self.updateFile.get(self.keys)
-                            # print("正在拷贝 %s" % b.updateFile.get(keys))
                             self.ssh.sftp_put(self.from_path, self.to_path)
-                            self.cmd = "md5sum %s|cut -d ' ' -f1" % self.to_path
-                            self.to_md5 = self.ssh.exe(self.cmd).strip()
-                            self.from_md5 = self.__CallMD5(self.from_path)
-                            if self.to_md5 == self.from_md5:
-                                continue
-                                # print("主机%s拷贝成功：%s " % (host, b.updateFile.get(keys)))
-                            else:
-                                print("主机%s上传文件%smd5不正确！！！！" % (self.host, self.updateFile.get(self.keys)))
+                            self.__checkMD5()
 
     def update_web(self):
         """
@@ -157,40 +128,72 @@ class Param(object):
                 )
                 for self.keys in self.updateFile.keys():
                     if self.keys != 'zip':
+                        """
+                        非全包更新扩展
+                        """
                         continue
                     else:
                         for self.i in range(len(self.remotePath)):
                             self.cmd = "zip -r %s %s" % (
                                 self.remotePath[self.i] + datetime.date.today().strftime('%Y-%m-%d') + '.zip',
                                 self.remotePath[self.i] + self.serverType + '/')
-                            #print("这是压缩命令%s" % self.cmd)
                             self.ssh.exe(self.cmd)
                             self.from_path = self.localPath + self.updateFile.get(self.keys)
                             self.to_path = self.remotePath[self.i] + self.updateFile.get(self.keys)
                             self.ssh.sftp_put(self.from_path, self.to_path)
-                            self.cmd = "md5sum %s|cut -d ' ' -f1" % self.to_path
-                            #print(self.cmd)
-                            self.to_md5 = self.ssh.exe(self.cmd).strip()
-                            #print("远程md5=%s" % self.to_md5)
-                            self.from_md5 = self.__CallMD5(self.from_path)
-                            #print(self.from_md5)
-                            if self.to_md5 == self.from_md5:
-                                self.cmd = "unzip -qo %s -d %s" % (self.to_path, self.remotePath[self.i])
-                                self.ssh.exe(self.cmd)
-                                print("update成功: %s %s %s %s" % (self.hosts[self.index].split(':')[0], self.type,
-                                                                 self.serverType, self.to_path))
-                            else:
-                                print("主机%s上传文件%smd5不正确！！！！" % (self.hosts[self.index].split(':')[0],
-                                                                self.updateFile.get(self.keys)))
+                            self.__checkMD5()
 
     def update_brnn(self):
         """
-
+        升级游戏，百人牛牛
         """
-        pass
+        if self.type == 'game' and self.serverType == 'brnn':
+            for self.index in range(len(self.hosts)):
+                self.ssh = SFTP.MySSH(
+                    host=self.hosts[self.index].split(':')[0],
+                    port=int(self.hosts[self.index].split(':')[1]),
+                    username=self.username,
+                    password=self.password
+                )
+                for self.keys in self.updateFile.keys():
+                    if self.keys == 'baisc':
+                        for self.i in self.remotePath.keys():
+                            if self.i == 'master':
+                                self.to_path = self.remotePath.get(self.i) + 'lib/' + self.updateFile.get(self.keys)
+                                self.from_path = self.localPath + self.updateFile.get(self.keys)
+                                self.ssh.sftp_put(self.from_path, self.to_path)
+                                self.__checkMD5()
+                            else:
+                                if self.i == 'slave':
+                                    self.to_path = self.remotePath.get(
+                                        self.i) + 'extension/__lib__/' + self.updateFile.get(
+                                        self.keys)
+                                    self.from_path = self.localPath + self.remotePath.get(self.keys)
+                                    self.ssh.sftp_put(self.from_path, self.to_path)
+                                    self.__checkMD5()
+                    else:
+                        if self.keys == 'extensions':
+                            self.to_path = self.remotePath.get('slave') + 'lib/' + self.updateFile.get(self.keys)
+                            self.from_path = self.localPath + self.updateFile.get(self.keys)
+                            self.ssh.sftp_put(self.from_path, self.to_path)
+                            self.__checkMD5()
+                        else:
+                            if self.keys == 'yml':
+                                self.to_path = self.remotePath.get('slave') + self.updateFile.get(self.keys)
+                                self.from_path = self.localPath + self.updateFile.get(self.keys)
+                                self.ssh.sftp_put(self.from_path, self.to_path)
+                                self.__checkMD5()
 
     def update_worldcup(self):
-        pass
+
+        if self.type == 'game' and self.serverType == 'worldcup':
+            for self.index in range(len(self.hosts)):
+                self.ssh = SFTP.MySSH(
+                    host=self.hosts[self.index].split(':')[0],
+                    port=int(self.hosts[self.index].split(':')[1]),
+                    username=self.username,
+                    password=self.password
+                )
 
     @staticmethod
     def __CallMD5(filename):
@@ -205,6 +208,18 @@ class Param(object):
                 return hashes
         except Exception as e:
             print("本地文件%s不存在 %s" % (filename, e))
+
+    def __checkMD5(self):
+
+        self.cmd = "md5sum %s|cut -d ' ' -f1" % self.to_path
+        self.to_md5 = self.ssh.exe(self.cmd).strip()
+        self.from_md5 = self.__CallMD5(self.from_path)
+        if self.to_md5 == self.from_md5:
+            print(
+                "update成功: %s %s %s %s" % (self.hosts[self.index].split(':')[0], self.type,
+                                           self.serverType, self.to_path))
+        else:
+            print("主机%s上传文件%smd5不正确！！！！" % (self.host, b.updateFile.get(self.keys)))
 
 
 if "__main__" == __name__:
