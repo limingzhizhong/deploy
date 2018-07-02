@@ -47,7 +47,7 @@ class Param(object):
         self.ssh = None
         self.update_hz()
         self.update_game()
-        #self.update_web()
+        # self.update_web()
 
     def __get_host(self):
         self.type = self.values.get('type')
@@ -147,7 +147,7 @@ class Param(object):
         """
         升级游戏，百人牛牛
         """
-        if self.type == 'game' and self.serverType == 'brnn':
+        if self.type == 'hz' and self.serverType == 'baiRen':
             for self.index in range(len(self.hosts)):
                 self.ssh = SFTP.MySSH(
                     host=self.hosts[self.index].split(':')[0],
@@ -183,6 +183,9 @@ class Param(object):
                                 self.from_path = self.localPath + self.updateFile.get(self.keys)
                                 self.ssh.sftp_put(self.from_path, self.to_path)
                                 self.__checkMD5()
+                            else:
+                                self.to_path = self.remotePath.get('slave') + self.updateFile.get(self.keys)
+                                self.from_path = self.localPath + self.updateFile.get(self.keys)
 
     def update_worldcup(self):
 
