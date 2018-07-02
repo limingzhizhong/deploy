@@ -1,0 +1,13 @@
+host12:
+  type: game
+  serverType: baiRen
+  ip: ['192.168.200.86:9300']
+  remotePath: ['/home/GameServerBaiRenCong/']
+  updateFile:
+    basic: basic-core-1.0-SNAPSHOT.jar
+    api: cacheAPI.jar
+    extensions: BaiRenExtension.jar
+    snake: snakeyaml-1.20.jar
+    busies: business-core-1.0.0-RELEASES.jar
+    yml: cache-api.yml
+  localPath: /home/update/lib/

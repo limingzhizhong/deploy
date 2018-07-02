@@ -108,7 +108,7 @@ class Param(object):
                             self.ssh.sftp_put(self.from_path, self.to_path)
                             self.__checkMD5()
                     else:
-                        for i in range(len(b.remotePath)):
+                        for i in range(len(self.remotePath)):
                             self.from_path = self.localPath + self.updateFile.get(self.keys)
                             self.to_path = self.remotePath[i] + self.updateFile.get(self.keys)
                             self.ssh.sftp_put(self.from_path, self.to_path)
@@ -222,7 +222,7 @@ class Param(object):
                 "update成功: %s %s %s %s" % (self.hosts[self.index].split(':')[0], self.type,
                                            self.serverType, self.to_path))
         else:
-            print("主机%s上传文件%smd5不正确！！！！" % (self.host, b.updateFile.get(self.keys)))
+            print("主机%s上传文件%smd5不正确！！！！" % (self.host, self.updateFile.get(self.keys)))
 
 
 if "__main__" == __name__:
@@ -230,5 +230,10 @@ if "__main__" == __name__:
     data = read_file(loadfile)
     username = input("请输入用户名:")
     password = getpass.getpass()
-    for KEY in data.keys():
-        b = Param(data.get(KEY), user=username, passwd=password)
+
+    def start():
+        for KEY in data.keys():
+            b = Param(data.get(KEY), user=username, passwd=password)
+
+
+    start()
