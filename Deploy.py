@@ -226,7 +226,7 @@ class Param(object):
 
 
 if "__main__" == __name__:
-    loadfile = '/Users/admin/Documents/deploy/Deploy2.yml'
+    loadfile = './deploy.yml'
     data = read_file(loadfile)
     username = input("请输入用户名:")
     password = getpass.getpass()
