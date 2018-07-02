@@ -85,7 +85,7 @@ class Param(object):
         """
         if self.type == 'game':
             for self.keys in self.updateFile.keys():
-                if self.type == 'game' and self.keys != 'extensions':
+                if self.type == 'game' and self.keys != 'extensions' and self.keys != 'yml':
                     for self.index in range(len(self.hosts)):
                         self.ssh = SFTP.MySSH(
                             host=self.hosts[self.index].split(':')[0],
@@ -108,9 +108,9 @@ class Param(object):
                             self.ssh.sftp_put(self.from_path, self.to_path)
                             self.__checkMD5()
                     else:
-                        for i in range(len(self.remotePath)):
+                        for self.i in range(len(self.remotePath)):
                             self.from_path = self.localPath + self.updateFile.get(self.keys)
-                            self.to_path = self.remotePath[i] + self.updateFile.get(self.keys)
+                            self.to_path = self.remotePath[self.i] + self.updateFile.get(self.keys)
                             self.ssh.sftp_put(self.from_path, self.to_path)
                             self.__checkMD5()
 
