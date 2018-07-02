@@ -47,7 +47,7 @@ class Param(object):
         self.ssh = None
         self.update_hz()
         self.update_game()
-        self.update_web()
+        #self.update_web()
 
     def __get_host(self):
         self.type = self.values.get('type')
