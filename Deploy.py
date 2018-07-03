@@ -67,7 +67,7 @@ class Param(object):
                     for self.index in range(len(self.hosts)):
                         self.ssh = SFTP.MySSH(
                             host=self.hosts[self.index].split(':')[0],
-                            port=self.hosts[self.index].split(':')[1],
+                            port=int(self.hosts[self.index].split(':')[1]),
                             username=self.username,
                             password=self.password
                         )
@@ -103,7 +103,8 @@ class Param(object):
                     if self.keys != 'yml':
                         for self.i in range(len(self.remotePath)):
                             self.from_path = self.localPath + self.updateFile.get(self.keys)
-                            self.to_path = self.remotePath[self.i] + 'extensions/' + self.serverType + '/' + self.updateFile.get(
+                            self.to_path = self.remotePath[
+                                               self.i] + 'extensions/' + self.serverType + '/' + self.updateFile.get(
                                 self.keys)
                             self.ssh.sftp_put(self.from_path, self.to_path)
                             self.__checkMD5()

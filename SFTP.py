@@ -84,9 +84,12 @@ class MySSH(object):
         '''''
             让远程服务器执行cmd
         '''
-        stdin, stdout, stderr = self.ssh.exec_command(cmd)
-        self.a = stdout.readline()
-        #if cmd.find('md5') == 0:
+        try:
+            stdin, stdout, stderr = self.ssh.exec_command(cmd)
+            self.a = stdout.readline()
+            #if cmd.find('md5') == 0:
+        except Exception as e:
+            print("", e)
         return self.a
 
     def close(self):
