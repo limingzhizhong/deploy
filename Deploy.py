@@ -136,9 +136,10 @@ class Param(object):
                         continue
                     else:
                         for self.i in range(len(self.remotePath)):
-                            self.cmd = "zip -r %s %s" % (
-                                self.remotePath[self.i] + datetime.date.today().strftime('%Y-%m-%d') + '.zip',
-                                self.remotePath[self.i] + self.serverType + '/')
+                            self.cmd = "mv  %s %s" % (
+                                self.remotePath[self.i] + self.serverType + self.updateFile.get(self.keys),
+                                self.remotePath[self.i] + datetime.date.today().strftime('%Y-%m-%d') + '.war'
+                                )
                             self.ssh.exe(self.cmd)
                             self.from_path = self.localPath + self.updateFile.get(self.keys)
                             self.to_path = self.remotePath[self.i] + self.updateFile.get(self.keys)
