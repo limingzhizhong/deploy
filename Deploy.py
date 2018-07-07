@@ -128,23 +128,23 @@ class Param(object):
                     username=self.username,
                     password=self.password
                 )
-                if self.serverType == 'web':
-                    for self.keys in self.updateFile.keys():
-                        if self.keys != 'zip':
-                            """
-                            非全包更新扩展
-                            """
-                            continue
-                        else:
-                            for self.i in range(len(self.remotePath)):
-                                self.cmd = "zip -r %s %s" % (
-                                    self.remotePath[self.i] + datetime.date.today().strftime('%Y-%m-%d') + '.zip',
-                                    self.remotePath[self.i] + self.serverType + '/')
-                                self.ssh.exe(self.cmd)
-                                self.from_path = self.localPath + self.updateFile.get(self.keys)
-                                self.to_path = self.remotePath[self.i] + self.updateFile.get(self.keys)
-                                self.ssh.sftp_put(self.from_path, self.to_path)
-                                self.__checkMD5()
+                for self.keys in self.updateFile.keys():
+                    if self.keys != 'zip':
+                        """
+                        非全包更新扩展
+                        """
+                        continue
+                    else:
+                        for self.i in range(len(self.remotePath)):
+                            self.cmd = "zip -r %s %s" % (
+                                self.remotePath[self.i] + datetime.date.today().strftime('%Y-%m-%d') + '.zip',
+                                self.remotePath[self.i] + self.serverType + '/')
+                            self.ssh.exe(self.cmd)
+                            self.from_path = self.localPath + self.updateFile.get(self.keys)
+                            self.to_path = self.remotePath[self.i] + self.updateFile.get(self.keys)
+                            self.ssh.sftp_put(self.from_path, self.to_path)
+                            self.__checkMD5()
+
 
     def update_brnn(self):
         """
