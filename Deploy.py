@@ -182,11 +182,16 @@ class Param(object):
 
 
 if "__main__" == __name__:
-    if len(sys.argv) < 2:
-        print("请跟上yml文件路径")
-    else:
+    #if len(sys.argv) < 2:
+    #    print("请跟上yml文件路径")
+   # else:
         logger()
-        data = read_file(sys.argv[1])
+        data = read_file('./hk.yml')
+        for values in data.values():
+            temp1 = values.get('serverType')
+            temp2 = values.get('ip')
+            temp3 = values.get('remotePath')
+            logging.error("将要更新的服务清单:IP地址:%s,服务类型:%s" % (temp2, temp1))
         username = input("请输入用户名:")
         password = getpass.getpass()
         for KEY in data.keys():
