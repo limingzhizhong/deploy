@@ -94,9 +94,10 @@ class MySSH(object):
         """
         try:
             stdin, stdout, stderr = self.ssh.exec_command(cmd)
+            a = stdout.readline()
         except Exception as e:
             logging.error("", e)
-        return stdout.readline()
+        return a
 
     def close(self):
         self.ssh.close()

@@ -150,7 +150,6 @@ class Param(object):
                             self.__checkMD5(ssh, from_path, to_path)
                             cmd = 'unzip -qo %s -d %s ' % (self.remotePath[i] + self.updateFile.get(keys),
                                                            self.remotePath[i])
-                            print(cmd)
                             ssh.exe(cmd)
                             cmd = '\cp -r /root/conf/* %sWEB-INF/class/conf/*' % self.remotePath[i]
                             ssh.exe(cmd)
