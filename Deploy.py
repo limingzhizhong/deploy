@@ -148,11 +148,11 @@ class Param(object):
                             to_path = self.remotePath[i] + self.updateFile.get(keys)
                             ssh.sftp_put(from_path, to_path)
                             self.__checkMD5(ssh, from_path, to_path)
-                            cmd = "cd %s" % self.remotePath[i]
+                            cmd = 'unzip -qo %s -d %s ' % (self.remotePath[i] + self.updateFile.get(keys),
+                                                           self.remotePath[i])
+                            print(cmd)
                             ssh.exe(cmd)
-                            cmd = "unzip %s" % self.updateFile.get(keys)
-                            ssh.exe(cmd)
-                            cmd = "\cp -r /root/conf/* %sWEB-INF/class/conf/*" % self.remotePath[i]
+                            cmd = '\cp -r /root/conf/* %sWEB-INF/class/conf/*' % self.remotePath[i]
                             ssh.exe(cmd)
 
     @staticmethod
