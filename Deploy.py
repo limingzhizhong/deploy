@@ -182,9 +182,9 @@ class Param(object):
 
 
 if "__main__" == __name__:
-    #if len(sys.argv) < 2:
-    #    print("请跟上yml文件路径")
-   # else:
+    if len(sys.argv) < 2:
+       print("请跟上yml文件路径")
+    else:
         logger()
         data = read_file('./hk.yml')
         for values in data.values():
