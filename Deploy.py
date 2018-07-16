@@ -68,19 +68,18 @@ class Param(object):
         """
         if self.type == 'hz':
             for keys in self.updateFile.keys():
-                if self.type == 'hz':
-                    for index in range(len(self.hosts)):
-                        ssh = SFTP.MySSH(
-                            host=self.hosts[index].split(':')[0],
-                            port=int(self.hosts[index].split(':')[1]),
-                            username=self.username,
-                            password=self.password
-                        )
-                        for i in range(len(self.remotePath)):
-                            from_path = self.localPath + self.updateFile.get(keys)
-                            to_path = self.remotePath[i] + 'lib/' + self.updateFile.get(keys)
-                            ssh.sftp_put(from_path, to_path)
-                            self.__checkMD5(ssh, from_path, to_path)
+                for index in range(len(self.hosts)):
+                    ssh = SFTP.MySSH(
+                        host=self.hosts[index].split(':')[0],
+                        port=int(self.hosts[index].split(':')[1]),
+                        username=self.username,
+                        password=self.password
+                    )
+                    for i in range(len(self.remotePath)):
+                        from_path = self.localPath + self.updateFile.get(keys)
+                        to_path = self.remotePath[i] + 'lib/' + self.updateFile.get(keys)
+                        ssh.sftp_put(from_path, to_path)
+                        self.__checkMD5(ssh, from_path, to_path)
                 else:
                     continue
 
@@ -140,9 +139,9 @@ class Param(object):
                         continue
                     else:
                         for i in range(len(self.remotePath)):
-                            cmd = "mv  %s %s" % (
-                                self.remotePath[i] + self.serverType + self.updateFile.get(keys),
-                                self.remotePath[i] + datetime.date.today().strftime('%Y-%m-%d') + '.zip'
+                            cmd = "zip -r  %s %s" % (
+                                self.remotePath[i] + datetime.date.today().strftime('%Y-%m-%d') + '.zip',
+                                self.remotePath[i] + self.serverType + self.updateFile.get(keys)
                             )
                             ssh.exe(cmd)
                             from_path = self.localPath + self.updateFile.get(keys)
@@ -183,7 +182,7 @@ class Param(object):
 
 if "__main__" == __name__:
     if len(sys.argv) < 2:
-       print("请跟上yml文件路径")
+        print("请跟上yml文件路径")
     else:
         logger()
         data = read_file('./hk.yml')
