@@ -149,7 +149,7 @@ class Param(object):
                             ssh.sftp_put(from_path, to_path)
                             self.__checkMD5(ssh, from_path, to_path)
                             cmd = 'unzip -qo %s -d %s ' % (self.remotePath[i] + self.updateFile.get(keys),
-                                                           self.remotePath[i])
+                                                           self.remotePath[i] + self.serverType)
                             ssh.exe(cmd)
                             cmd = '\cp -r /root/conf/* %sWEB-INF/class/conf/*' % self.remotePath[i]
                             ssh.exe(cmd)
