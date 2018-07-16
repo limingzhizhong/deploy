@@ -141,7 +141,7 @@ class Param(object):
                         for i in range(len(self.remotePath)):
                             cmd = "zip -r  %s %s" % (
                                 self.remotePath[i] + datetime.date.today().strftime('%Y-%m-%d') + '.zip',
-                                self.remotePath[i] + self.serverType + self.updateFile.get(keys)
+                                self.remotePath[i] + self.updateFile.get(keys)
                             )
                             ssh.exe(cmd)
                             from_path = self.localPath + self.updateFile.get(keys)
@@ -150,7 +150,7 @@ class Param(object):
                             self.__checkMD5(ssh, from_path, to_path)
                             cmd = "cd %s" % self.remotePath[i]
                             ssh.exe(cmd)
-                            cmd = "zip %s" % self.updateFile.get(keys)
+                            cmd = "unzip %s" % self.updateFile.get(keys)
                             ssh.exe(cmd)
                             cmd = "\cp -r /root/conf/* %sWEB-INF/class/conf/*" % self.remotePath[i]
                             ssh.exe(cmd)
@@ -185,7 +185,7 @@ if "__main__" == __name__:
         print("请跟上yml文件路径")
     else:
         logger()
-        data = read_file('./hk.yml')
+        data = read_file(sys.argv[1])
         for values in data.values():
             temp1 = values.get('serverType')
             temp2 = values.get('ip')
