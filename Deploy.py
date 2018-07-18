@@ -139,19 +139,25 @@ class Param(object):
                         continue
                     else:
                         for i in range(len(self.remotePath)):
-                            cmd = "zip -r  %s %s" % (
-                                self.remotePath[i] + datetime.date.today().strftime('%Y-%m-%d') + '.zip',
-                                self.remotePath[i] + self.updateFile.get(keys)
-                            )
-                            ssh.exe(cmd)
                             from_path = self.localPath + self.updateFile.get(keys)
                             to_path = self.remotePath[i] + self.updateFile.get(keys)
+                            cmd = "zip -r  %s %s" % (
+                                self.remotePath[i] + datetime.date.today().strftime('%Y-%m-%d') + '.zip',
+                                self.remotePath[i] + self.serverType
+                            )
+                            logging.info("开始备份文件：%s" % cmd)
+                            ssh.exe(cmd)
+                            cmd = "rm -fr %s" % self.remotePath[i] + self.serverType
+                            logging.info("开始删除文件：%s" % cmd)
+                            ssh.exe(cmd)
                             ssh.sftp_put(from_path, to_path)
                             self.__checkMD5(ssh, from_path, to_path)
-                            cmd = 'unzip -qo %s -d %s ' % (self.remotePath[i] + self.updateFile.get(keys),
-                                                           self.remotePath[i] + self.serverType)
+                            cmd = 'unzip -qo %s -d %s ' % (to_path, self.remotePath[i] + self.serverType)
+                            logging.info("开始解压文件：%s" % cmd)
                             ssh.exe(cmd)
                             cmd = '\cp -r /root/conf/* %sWEB-INF/class/conf/*' % self.remotePath[i]
+                            ssh.exe(cmd)
+                            cmd = '\cp -r /root/cache-api.yml/* %sWEB-INF/class/' % self.remotePath[i]
                             ssh.exe(cmd)
 
     @staticmethod
@@ -181,10 +187,10 @@ class Param(object):
 
 if "__main__" == __name__:
     if len(sys.argv) < 2:
-        print("请跟上yml文件路径")
+       print("请跟上yml文件路径")
     else:
         logger()
-        data = read_file(sys.argv[1])
+        data = read_file('./test.yml')
         for values in data.values():
             temp1 = values.get('serverType')
             temp2 = values.get('ip')
