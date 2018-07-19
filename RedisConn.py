@@ -1,6 +1,7 @@
 import redis
 import yaml
 
+
 class RedisConn(object):
 
     def __init__(self, host, port, password=''):
@@ -21,7 +22,7 @@ def read_file(file):
     exit()
 
 
-if "__main__" == __name__:
+def start():
     data = read_file('./serverConfig.yml')
     redis_conn = RedisConn(host='127.0.0.1', port=16789)
     for key in data.keys():
