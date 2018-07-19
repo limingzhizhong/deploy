@@ -1,11 +1,10 @@
-import yaml
 import SFTP
 import getpass
-import hashlib
 import datetime
 import sys
 import logging
-import RedisConn
+from utils import check
+from utils import LoadFile
 
 
 def logger():
@@ -15,15 +14,6 @@ def logger():
         format="%(asctime)s %(filename)s[line:%(lineno)d]%(levelname)s - %(message)s",
         datefmt="%m/%d/%Y %I:%M:%S %p"
     )
-
-
-def read_file(file):
-    try:
-        with open(file, 'r') as f:
-            return yaml.load(f)
-    except Exception as e:
-        print("", e)
-        exit()
 
 
 class Param(object):
@@ -80,7 +70,7 @@ class Param(object):
                         from_path = self.localPath + self.updateFile.get(keys)
                         to_path = self.remotePath[i] + 'lib/' + self.updateFile.get(keys)
                         ssh.sftp_put(from_path, to_path)
-                        self.__checkMD5(ssh, from_path, to_path)
+                        check.checkMD5(ssh, from_path, to_path)
                 else:
                     continue
 
@@ -103,7 +93,7 @@ class Param(object):
                                 from_path = self.localPath + self.updateFile.get(keys)
                                 to_path = self.remotePath[i] + 'extensions/__lib__/' + self.updateFile.get(keys)
                                 ssh.sftp_put(from_path, to_path)
-                                self.__checkMD5(ssh, from_path, to_path)
+                                check.checkMD5(ssh, from_path, to_path)
                         else:
                             if keys != 'yml':
                                 for i in range(len(self.remotePath)):
@@ -112,13 +102,13 @@ class Param(object):
                                                   i] + 'extensions/' + self.serverType + '/' + self.updateFile.get(
                                         keys)
                                     ssh.sftp_put(from_path, to_path)
-                                    self.__checkMD5(ssh, from_path, to_path)
+                                    check.checkMD5(ssh, from_path, to_path)
                             else:
                                 for i in range(len(self.remotePath)):
                                     from_path = self.localPath + self.updateFile.get(keys)
                                     to_path = self.remotePath[i] + self.updateFile.get(keys)
                                     ssh.sftp_put(from_path, to_path)
-                                    self.__checkMD5(ssh, from_path, to_path)
+                                    check.checkMD5(ssh, from_path, to_path)
 
     def update_web(self):
         """
@@ -152,7 +142,7 @@ class Param(object):
                             logging.info("开始删除文件：%s" % cmd)
                             ssh.exe(cmd)
                             ssh.sftp_put(from_path, to_path)
-                            self.__checkMD5(ssh, from_path, to_path)
+                            check.checkMD5(ssh, from_path, to_path)
                             cmd = 'unzip -qo %s -d %s ' % (to_path, self.remotePath[i] + self.serverType)
                             logging.info("开始解压文件：%s" % cmd)
                             ssh.exe(cmd)
@@ -163,37 +153,13 @@ class Param(object):
                             cmd = '\cp -r /root/cache-api.yml/* %sWEB-INF/class/' % self.remotePath[i]
                             ssh.exe(cmd)
 
-    @staticmethod
-    def __CallMD5(filename):
-        """
-            获取文件md5, 用来检验文件传输完整性
-        """
-        try:
-            with open(filename, 'rb') as f:
-                md5obj = hashlib.md5()
-                md5obj.update(f.read())
-                hashes = md5obj.hexdigest()
-                return hashes
-        except Exception as e:
-            logging.error("本地文件%s不存在 %s" % (filename, e))
-
-    def __checkMD5(self, ssh, from_path, to_path):
-
-        cmd = "md5sum %s|cut -d ' ' -f1" % to_path
-        to_md5 = ssh.exe(cmd).strip()
-        from_md5 = self.__CallMD5(from_path)
-        if to_md5 == from_md5:
-            logging.error("update %s 路径%s 成功" % (ssh.host, to_path))
-        else:
-            logging.error("update %s 路径%s 失败" % (ssh.host, to_path))
-
 
 if "__main__" == __name__:
-    if len(sys.argv) < 2:
+    if len(sys.argv) < 1:
         print("请跟上yml文件路径")
     else:
         logger()
-        data = read_file(sys.argv[1])
+        data = LoadFile.read_file('./yml/test.yml')
         for values in data.values():
             temp1 = values.get('serverType')
             temp2 = values.get('ip')
