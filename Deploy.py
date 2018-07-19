@@ -155,11 +155,13 @@ class Param(object):
                             cmd = 'unzip -qo %s -d %s ' % (to_path, self.remotePath[i] + self.serverType)
                             logging.info("开始解压文件：%s" % cmd)
                             ssh.exe(cmd)
-                            cmd = '\cp -r /root/conf/* %sWEB-INF/class/conf/*' % self.remotePath[i]
+                            cmd = '\cp -r /root/%s/conf/* %sWEB-INF/class/conf/*' % (self.serverType,
+                                                                                        self.remotePath[i])
+                            logging.info("开始拷贝配置:%s" % cmd)
                             ssh.exe(cmd)
-                            cmd = '\cp -r /root/cache-api.yml/* %sWEB-INF/class/' % self.remotePath[i]
-                            ssh.exe(cmd)
-
+                            logging.info("开始上传yml配置：%s" % self.remotePath[i]+'WEB-INF/class/')
+                            ssh.sftp_put(self.localPath + 'cache-api.yml', self.remotePath[i]+'WEB-INF/class/')
+                            self.__checkMD5(ssh, self.localPath + 'cache-api.yml', self.remotePath[i]+'WEB-INF/class/')
     @staticmethod
     def __CallMD5(filename):
         """
@@ -187,10 +189,10 @@ class Param(object):
 
 if "__main__" == __name__:
     if len(sys.argv) < 2:
-       print("请跟上yml文件路径")
+        print("请跟上yml文件路径")
     else:
         logger()
-        data = read_file('./test.yml')
+        data = read_file(sys.argv[1])
         for values in data.values():
             temp1 = values.get('serverType')
             temp2 = values.get('ip')
