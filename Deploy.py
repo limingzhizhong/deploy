@@ -5,6 +5,7 @@ import hashlib
 import datetime
 import sys
 import logging
+import RedisConn
 
 
 def logger():
@@ -157,6 +158,8 @@ class Param(object):
                             ssh.exe(cmd)
                             cmd = '\cp -r /root/conf/* %sWEB-INF/class/conf/*' % self.remotePath[i]
                             ssh.exe(cmd)
+                            ssh.sftp_put('/home/update/lib/cache-api.yml',
+                                         self.remotePath[i] + self.serverType + 'WEB-INF/class/cache-api.yml')
                             cmd = '\cp -r /root/cache-api.yml/* %sWEB-INF/class/' % self.remotePath[i]
                             ssh.exe(cmd)
 
@@ -187,10 +190,10 @@ class Param(object):
 
 if "__main__" == __name__:
     if len(sys.argv) < 2:
-       print("请跟上yml文件路径")
+        print("请跟上yml文件路径")
     else:
         logger()
-        data = read_file('./test.yml')
+        data = read_file(sys.argv[1])
         for values in data.values():
             temp1 = values.get('serverType')
             temp2 = values.get('ip')

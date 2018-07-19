@@ -6,7 +6,7 @@ setup(
     description='setup deply',
     long_description='',
     license='MIT',
-    install_requires=['paramiko', 'PyYAML'],
+    install_requires=['paramiko', 'PyYAML', 'redis'],
     packages=find_packages(),
     include_package_data=True,
     entry_points={
