@@ -1,10 +1,7 @@
 import SFTP
-import getpass
 import datetime
-import sys
 import logging
 from utils import check
-from utils import LoadFile
 
 
 def logger():
@@ -154,18 +151,3 @@ class Param(object):
                             ssh.exe(cmd)
 
 
-if "__main__" == __name__:
-    if len(sys.argv) < 1:
-        print("请跟上yml文件路径")
-    else:
-        logger()
-        data = LoadFile.read_file('./yml/test.yml')
-        for values in data.values():
-            temp1 = values.get('serverType')
-            temp2 = values.get('ip')
-            temp3 = values.get('remotePath')
-            logging.error("将要更新的服务清单:IP地址:%s,服务类型:%s" % (temp2, temp1))
-        username = input("请输入用户名:")
-        password = getpass.getpass()
-        for KEY in data.keys():
-            b = Param(data.get(KEY), user=username, passwd=password)
