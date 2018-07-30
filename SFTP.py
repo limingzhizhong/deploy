@@ -66,7 +66,7 @@ class MySSH(object):
             sftp = paramiko.SFTPClient.from_transport(t)
             sftp.put(from_path, to_path, callback=self.__callback(100, 100))
             t.close()
-            logging.error("%s 上传成功" % self.host)
+            logging.info("%s 上传成功" % self.host)
 
         except Exception as e:
             logging.error('sftp %s@%s: %s' % (self.username, self.host, e))

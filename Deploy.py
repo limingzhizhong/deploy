@@ -156,12 +156,14 @@ class Param(object):
                             logging.info("开始解压文件：%s" % cmd)
                             ssh.exe(cmd)
                             cmd = '\cp -r /root/%s/conf/* %sWEB-INF/class/conf/*' % (self.serverType,
-                                                                                        self.remotePath[i])
+                                                                                     self.remotePath[i])
                             logging.info("开始拷贝配置:%s" % cmd)
                             ssh.exe(cmd)
-                            logging.info("开始上传yml配置：%s" % self.remotePath[i]+'WEB-INF/class/')
-                            ssh.sftp_put(self.localPath + 'cache-api.yml', self.remotePath[i]+'WEB-INF/class/')
-                            self.__checkMD5(ssh, self.localPath + 'cache-api.yml', self.remotePath[i]+'WEB-INF/class/')
+                            logging.info("开始上传yml配置：%s" % self.remotePath[i] + 'WEB-INF/class/')
+                            ssh.sftp_put(self.localPath + 'cache-api.yml', self.remotePath[i] + 'WEB-INF/class/')
+                            self.__checkMD5(ssh, self.localPath + 'cache-api.yml',
+                                            self.remotePath[i] + 'WEB-INF/class/')
+
     @staticmethod
     def __CallMD5(filename):
         """
@@ -187,18 +189,22 @@ class Param(object):
             logging.error("update %s 路径%s 失败" % (ssh.host, to_path))
 
 
+def get_update_list(data):
+    for values in data.values():
+        temp1 = values.get('serverType')
+        temp2 = values.get('ip')
+        logging.error("将要更新的服务清单:IP地址:%s,服务类型:%s" % (temp2, temp1))
+
+
 if "__main__" == __name__:
     if len(sys.argv) < 2:
         print("请跟上yml文件路径")
     else:
-        logger()
-        data = read_file(sys.argv[1])
-        for values in data.values():
-            temp1 = values.get('serverType')
-            temp2 = values.get('ip')
-            temp3 = values.get('remotePath')
-            logging.error("将要更新的服务清单:IP地址:%s,服务类型:%s" % (temp2, temp1))
+        logger()  # 加载日志模块
+        data = read_file(sys.argv[1])  # 读取配置文件
+        get_update_list(data)  # 获取更新清单
         username = input("请输入用户名:")
         password = getpass.getpass()
         for KEY in data.keys():
             b = Param(data.get(KEY), user=username, passwd=password)
+        logging.error("升级完成！！！！")
