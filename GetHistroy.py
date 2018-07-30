@@ -1,6 +1,4 @@
 from utils import RedisConn
-import datetime
-import logging
 
 
 class RedisData(object):
@@ -9,8 +7,7 @@ class RedisData(object):
         self.redis = RedisConn.RedisConn('127.0.0.1', 6379)
         self.hash_map = 'deploy'
 
-    def save_data(self, data):
-        hash_map_key = datetime.date.today().strftime('%Y-%m-%d')
+    def save_data(self, hash_map_key, data):
         self.redis.redis_conn().hset(self.hash_map, hash_map_key, data)
         print("保存redis成功")
 
