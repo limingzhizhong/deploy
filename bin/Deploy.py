@@ -1,4 +1,4 @@
-import SFTP
+from bin import SFTP
 import datetime
 import logging
 from utils import check
@@ -143,11 +143,13 @@ class Param(object):
                             cmd = 'unzip -qo %s -d %s ' % (to_path, self.remotePath[i] + self.serverType)
                             logging.info("开始解压文件：%s" % cmd)
                             ssh.exe(cmd)
-                            cmd = '\cp -r /root/conf/* %sWEB-INF/class/conf/*' % self.remotePath[i]
+                            cmd = '\cp -r /root/%s/conf/* %sWEB-INF/class/conf/*' % (self.serverType,
+                                                                                     self.remotePath[i])
+                            logging.info("开始拷贝配置:%s" % cmd)
                             ssh.exe(cmd)
-                            ssh.sftp_put('/home/update/lib/cache-api.yml',
-                                         self.remotePath[i] + self.serverType + 'WEB-INF/class/cache-api.yml')
-                            cmd = '\cp -r /root/cache-api.yml/* %sWEB-INF/class/' % self.remotePath[i]
-                            ssh.exe(cmd)
+                            logging.info("开始上传yml配置：%s" % self.remotePath[i] + 'WEB-INF/class/')
+                            ssh.sftp_put(self.localPath + 'cache-api.yml', self.remotePath[i] + 'WEB-INF/class/')
+                            check.checkMD5(ssh, self.localPath + 'cache-api.yml',
+                                            self.remotePath[i] + 'WEB-INF/class/')
 
 

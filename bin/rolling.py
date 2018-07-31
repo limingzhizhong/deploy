@@ -1,6 +1,5 @@
-import Deploy
+from bin import Deploy, GetHistroy
 import logging
-import GetHistroy
 import getpass
 import yaml
 

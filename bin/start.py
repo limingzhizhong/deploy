@@ -1,7 +1,6 @@
-import Deploy
+from bin import Deploy, GetHistroy
 import logging
 from utils import LoadFile
-import GetHistroy
 import sys
 import getpass
 from utils import Replace
