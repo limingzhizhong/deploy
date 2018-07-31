@@ -24,3 +24,4 @@ if __name__ == '__main__':
         else:
             print('输入日期版本不存在')
             continue
+    logging.error('done')

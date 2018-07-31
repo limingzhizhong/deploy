@@ -26,3 +26,4 @@ if __name__ == '__main__':
         password = getpass.getpass()
         for KEY in data.keys():
             b = Deploy.Param(data.get(KEY), user=username, passwd=password)
+        logging.error('更新完成')

@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="deply",
+    name="deploy",
     version='1.0',
     description='setup deply',
     long_description='',
