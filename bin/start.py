@@ -1,24 +1,23 @@
 from bin import Deploy, GetHistroy
 import logging
-from utils import LoadFile
+from utils import LoadFile, Replace
 import sys
 import getpass
-from utils import Replace
 import datetime
 
 if __name__ == '__main__':
 
-    if len(sys.argv) < 2:
+    if len(sys.argv) > 2:
         print("请跟上yml文件路径")
     else:
         Deploy.logger()
+        sys.argv.append('./yml/hk_web.yml')
         date_time = datetime.date.today().strftime('%Y-%m-%d')
         Replace.ModifyFile(sys.argv[1], date_time)
         data = LoadFile.read_file(sys.argv[1])
         redis = GetHistroy.RedisData()
         yml = 'web'
         result = yml in sys.argv[1]
-        print(result)
         if result:
             redis.save_data(yml, date_time, data)
         else:

@@ -7,7 +7,7 @@ from utils import check
 def logger():
     logging.basicConfig(
         filename="update.log",
-        level=logging.ERROR,
+        level=logging.INFO,
         format="%(asctime)s %(filename)s[line:%(lineno)d]%(levelname)s - %(message)s",
         datefmt="%m/%d/%Y %I:%M:%S %p"
     )
@@ -129,8 +129,8 @@ class Param(object):
                         for i in range(len(self.remotePath)):
                             from_path = self.localPath + self.updateFile.get(keys)
                             to_path = self.remotePath[i] + self.updateFile.get(keys)
-                            cmd = "zip -r  %s %s" % (
-                                self.remotePath[i] + datetime.date.today().strftime('%Y-%m-%d') + '.zip',
+                            cmd = "tar zcf '%s' '%s' " % (
+                                self.remotePath[i] + datetime.date.today().strftime('%Y-%m-%d') + '.tar.gz',
                                 self.remotePath[i] + self.serverType
                             )
                             logging.info("开始备份文件：%s" % cmd)
