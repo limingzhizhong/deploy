@@ -17,9 +17,11 @@ class Param(object):
 
     def __init__(self, values, user, passwd) -> object:
         """
+        :type values: object
         :param values:
         :param user:
         :param passwd:
+
         hosts: 主机列别
         localPath: 本地文件路径
         remotePath: 需要更新的服务器文件路径
@@ -140,16 +142,16 @@ class Param(object):
                             ssh.exe(cmd)
                             ssh.sftp_put(from_path, to_path)
                             check.checkMD5(ssh, from_path, to_path)
-                            cmd = 'unzip -qo %s -d %s ' % (to_path, self.remotePath[i] + self.serverType)
+                            cmd = 'unzip -qo %s -d %s ' % (to_path, self.remotePath[i])
                             logging.info("开始解压文件：%s" % cmd)
                             ssh.exe(cmd)
                             cmd = '\cp -r /root/%s/conf/* %sWEB-INF/class/conf/*' % (self.serverType,
                                                                                      self.remotePath[i])
                             logging.info("开始拷贝配置:%s" % cmd)
                             ssh.exe(cmd)
-                            logging.info("开始上传yml配置：%s" % self.remotePath[i] + 'WEB-INF/class/')
-                            ssh.sftp_put(self.localPath + 'cache-api.yml', self.remotePath[i] + 'WEB-INF/class/')
+                            logging.info("开始上传yml配置：%s" % self.remotePath[i] + self.serverType + 'WEB-INF/class/')
+                            ssh.sftp_put(self.localPath + 'cache-api.yml', self.remotePath[i] + self.serverType + 'WEB-INF/class/')
                             check.checkMD5(ssh, self.localPath + 'cache-api.yml',
-                                            self.remotePath[i] + 'WEB-INF/class/')
+                                            self.remotePath[i] + self.serverType + 'WEB-INF/class/')
 
 
