@@ -2,6 +2,7 @@ from bin import SFTP
 import datetime
 import logging
 from utils import check
+import time
 
 
 def logger():
@@ -145,13 +146,13 @@ class Param(object):
                             cmd = 'unzip -qo %s -d %s ' % (to_path, self.remotePath[i])
                             logging.info("开始解压文件：%s" % cmd)
                             ssh.exe(cmd)
+                            time.sleep(2)
                             cmd = '\cp -r /root/%s/conf/* %sWEB-INF/class/conf/*' % (self.serverType,
                                                                                      self.remotePath[i])
                             logging.info("开始拷贝配置:%s" % cmd)
                             ssh.exe(cmd)
-                            logging.info("开始上传yml配置：%s" % self.remotePath[i] + self.serverType + 'WEB-INF/class/')
-                            ssh.sftp_put(self.localPath + 'cache-api.yml', self.remotePath[i] + self.serverType + 'WEB-INF/class/')
+                            logging.info("开始上传yml配置：%s" % self.remotePath[i] + self.serverType + '/WEB-INF/class/')
+                            ssh.sftp_put(self.localPath + 'cache-api.yml',
+                                         self.remotePath[i] + self.serverType + '/WEB-INF/class/')
                             check.checkMD5(ssh, self.localPath + 'cache-api.yml',
-                                            self.remotePath[i] + self.serverType + 'WEB-INF/class/')
-
-
+                                           self.remotePath[i] + self.serverType + '/WEB-INF/class/cache-api.yml')
